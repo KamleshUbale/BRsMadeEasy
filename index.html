@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BRsMadeEasy | Board Resolution Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                50: '#f0fdf4', /* Mint/White-ish tint */
+                100: '#dcfce7',
+                500: '#f97316', /* Saffron/Orange Accent for Buttons/Highlights */
+                600: '#ea580c', /* Darker Orange */
+                700: '#1d4ed8', /* Official Blue Primary */
+                800: '#1e40af', /* Darker Blue */
+                900: '#1e3a8a', /* Deep Navy (MCA Header style) */
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Print specific styles for PDF generation simulation */
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #print-section, #print-section * {
+          visibility: visible;
+        }
+        #print-section {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "jspdf": "https://esm.sh/jspdf@^4.0.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-50 text-slate-900 antialiased">
+    <div id="root"></div>
+  </body>
+</html>
