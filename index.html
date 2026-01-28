@@ -61,7 +61,12 @@
 </script>
 </head>
   <body class="bg-slate-50 text-slate-900 antialiased">
-    <div id="root"></div>
+    <div id="root" class="min-h-screen flex flex-col items-center justify-center text-slate-400">
+      <div class="animate-pulse flex flex-col items-center">
+        <div class="h-12 w-12 bg-slate-200 rounded-lg mb-4"></div>
+        <div class="text-sm font-medium">Loading BRsMadeEasy...</div>
+      </div>
+    </div>
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>
