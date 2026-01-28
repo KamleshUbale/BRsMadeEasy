@@ -3,7 +3,19 @@ import { GoogleGenAI } from "@google/genai";
 // NOTE: In a production app, never expose API keys on the client.
 // This is for demonstration purposes within the constraints of this environment.
 // The user would need to provide a key, or it would be proxied via backend.
-const API_KEY = process.env.API_KEY || ''; 
+// Safely check for process.env to avoid crashing in browsers where it's undefined
+const getApiKey = () => {
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.API_KEY || '';
+    }
+  } catch (e) {
+    // Ignore reference errors
+  }
+  return '';
+};
+
+const API_KEY = getApiKey();
 
 let ai: GoogleGenAI | null = null;
 
