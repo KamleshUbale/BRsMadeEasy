@@ -1,48 +1,62 @@
+
 import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Landing from './pages/Landing';
+import { WorkspaceProvider } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
 import CreateResolution from './pages/CreateResolution';
 import CreateTemplate from './pages/CreateTemplate';
 import ResolutionList from './pages/ResolutionList';
-import AdminPanel from './pages/AdminPanel';
 import ClientProfiles from './pages/ClientProfiles';
+import AdminPanel from './pages/AdminPanel';
 import Layout from './components/Layout';
+import { ResolutionData } from './types';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated, isAdmin, canCreateTemplate } = useAuth();
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'create' | 'template-builder' | 'list' | 'admin' | 'clients'>('dashboard');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'create' | 'template-builder' | 'list' | 'clients' | 'admin'>('dashboard');
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [editingResolution, setEditingResolution] = useState<ResolutionData | null>(null);
 
-  if (!isAuthenticated) {
-    return <Landing />;
-  }
+  const navigateToCreate = (clientId?: string) => {
+    setSelectedClientId(clientId || null);
+    setEditingResolution(null);
+    setCurrentPage('create');
+  };
 
-  // Route Guards
-  if (currentPage === 'admin' && !isAdmin) {
-     setCurrentPage('dashboard');
-  }
-
-  if (currentPage === 'template-builder' && !canCreateTemplate) {
-     setCurrentPage('dashboard');
-  }
+  const handleEditResolution = (res: ResolutionData) => {
+    setEditingResolution(res);
+    setCurrentPage('create');
+  };
 
   return (
-    <Layout activePage={currentPage} onNavigate={setCurrentPage}>
+    <Layout activePage={currentPage} onNavigate={(page) => { 
+      setCurrentPage(page); 
+      setSelectedClientId(null); 
+      setEditingResolution(null);
+    }}>
       {currentPage === 'dashboard' && <Dashboard onNavigate={setCurrentPage} />}
-      {currentPage === 'create' && <CreateResolution onComplete={() => setCurrentPage('list')} />}
+      {currentPage === 'create' && (
+        <CreateResolution 
+          initialClientId={selectedClientId} 
+          editResolution={editingResolution}
+          onComplete={() => { 
+            setCurrentPage('list'); 
+            setSelectedClientId(null); 
+            setEditingResolution(null);
+          }} 
+        />
+      )}
       {currentPage === 'template-builder' && <CreateTemplate onComplete={() => setCurrentPage('create')} />}
-      {currentPage === 'list' && <ResolutionList />}
-      {currentPage === 'clients' && <ClientProfiles />}
-      {currentPage === 'admin' && isAdmin && <AdminPanel />}
+      {currentPage === 'list' && <ResolutionList onEdit={handleEditResolution} />}
+      {currentPage === 'clients' && <ClientProfiles onDraftResolution={navigateToCreate} />}
+      {currentPage === 'admin' && <AdminPanel />}
     </Layout>
   );
 };
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
+    <WorkspaceProvider>
       <AppContent />
-    </AuthProvider>
+    </WorkspaceProvider>
   );
 };
 

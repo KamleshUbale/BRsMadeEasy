@@ -1,7 +1,9 @@
+
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { CompanyDetails, MeetingType, ResolutionType, CustomField, PersonalizedResolutionItem, CustomFieldType } from '../types';
-import { saveResolution } from '../services/storage';
+// Fix: Import GLOBAL_USER_ID to satisfy userId requirement
+import { saveResolution, GLOBAL_USER_ID } from '../services/storage';
 import { ChevronRight, ChevronLeft, Check, Download, Save, Plus, Trash2, GripVertical, Copy, Layers } from 'lucide-react';
 import jsPDF from 'jspdf';
 
@@ -10,7 +12,8 @@ interface Props {
 }
 
 const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
-  const { user } = useAuth();
+  // Fix: Remove 'user' from useAuth as it's not provided by the hook
+  const { isAdmin } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
@@ -203,16 +206,18 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
   };
 
   const handleSave = () => {
-    if (!user) return;
     setLoading(true);
     
     const content = generateFinalHTML();
+    // Fix: Use GLOBAL_USER_ID instead of non-existent user object
     saveResolution({
-      userId: user.id,
+      userId: GLOBAL_USER_ID,
       companyDetails,
       type: ResolutionType.PERSONALIZED,
       personalizedData: resolutions,
-      finalContent: content
+      finalContent: content,
+      items: [], // Fulfilling missing properties for ResolutionData
+      docType: 'RESOLUTION'
     });
 
     setTimeout(() => {
@@ -308,7 +313,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
        <div className="w-full lg:w-1/3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col">
           <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-white rounded-t-lg">
              <h3 className="font-semibold text-slate-700">Resolutions</h3>
-             <button onClick={addNewResolution} className="text-sm bg-brand-600 text-white px-2 py-1 rounded hover:bg-brand-700 flex items-center">
+             <button onClick={addNewResolution} className="text-sm bg-[#1b438d] text-white px-2 py-1 rounded hover:bg-[#163673] flex items-center">
                <Plus className="w-4 h-4 mr-1"/> Add
              </button>
           </div>
@@ -318,7 +323,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
                   key={res.id} 
                   onClick={() => setEditingRes(res)}
                   className={`p-3 rounded-md cursor-pointer border flex justify-between items-center ${
-                    editingRes?.id === res.id ? 'bg-white border-brand-500 shadow-sm ring-1 ring-brand-500' : 'bg-white border-slate-200 hover:border-brand-300'
+                    editingRes?.id === res.id ? 'bg-white border-[#1b438d] shadow-sm ring-1 ring-[#1b438d]' : 'bg-white border-slate-200 hover:border-[#1b438d]'
                   }`}
                 >
                    <div className="flex items-center gap-2">
@@ -358,7 +363,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
                   <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
                      <div className="flex justify-between items-center mb-3">
                         <label className="text-sm font-bold text-slate-700">Custom Input Fields</label>
-                        <button onClick={addFieldToRes} className="text-xs text-brand-600 hover:underline flex items-center"><Plus className="w-3 h-3 mr-1"/> Add Field</button>
+                        <button onClick={addFieldToRes} className="text-xs text-[#1b438d] hover:underline flex items-center"><Plus className="w-3 h-3 mr-1"/> Add Field</button>
                      </div>
                      
                      <div className="space-y-3">
@@ -383,7 +388,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
                               </select>
                               <button 
                                 onClick={() => navigator.clipboard.writeText(`{{${field.label}}}`)}
-                                className="text-slate-400 hover:text-brand-600" title="Copy Placeholder"
+                                className="text-slate-400 hover:text-[#1b438d]" title="Copy Placeholder"
                               >
                                  <Copy className="w-4 h-4" />
                               </button>
@@ -433,7 +438,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
                           <label className={labelClass}>{field.label} {field.required && '*'}</label>
                           <input 
                              type={field.type === 'date' ? 'date' : field.type === 'number' || field.type === 'currency' ? 'number' : 'text'}
-                             value={field.value}
+                             value={field.value || ''}
                              onChange={(e) => handleFieldValueChange(res.id, field.id, e.target.value)}
                              className={inputClass}
                              placeholder={field.type === 'currency' ? '0.00' : ''}
@@ -472,11 +477,11 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
         ].map((s) => (
           <div key={s.id} className="flex items-center">
             <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-xs font-bold transition-all ${
-               step >= s.id ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-300 text-slate-400'
+               step >= s.id ? 'bg-[#1b438d] border-[#1b438d] text-white' : 'bg-white border-slate-300 text-slate-400'
             }`}>
                {step > s.id ? <Check className="w-4 h-4"/> : s.id}
             </div>
-            <span className={`ml-2 text-sm font-medium ${step >= s.id ? 'text-indigo-800' : 'text-slate-400'}`}>{s.label}</span>
+            <span className={`ml-2 text-sm font-medium ${step >= s.id ? 'text-[#1b438d]' : 'text-slate-400'}`}>{s.label}</span>
             {s.id < 4 && <div className="w-12 h-px bg-slate-200 mx-4" />}
           </div>
         ))}
@@ -523,7 +528,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
                      <button onClick={handleDownloadPDF} className="px-6 py-2.5 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 transition-colors flex items-center shadow-md">
                         <Download className="w-5 h-5 mr-2" /> Download PDF
                      </button>
-                     <button onClick={handleSave} disabled={loading} className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center shadow-md">
+                     <button onClick={handleSave} disabled={loading} className="px-6 py-2.5 bg-[#1b438d] text-white rounded-lg font-medium hover:bg-[#163673] transition-colors flex items-center shadow-md">
                         {loading ? 'Saving...' : <><Save className="w-5 h-5 mr-2" /> Save to Cloud</>}
                      </button>
                   </>
@@ -531,7 +536,7 @@ const PersonalizedResolution: React.FC<Props> = ({ onComplete }) => {
                   <button 
                      onClick={() => setStep(s => Math.min(4, s + 1))}
                      disabled={step === 1 && !companyDetails.companyName}
-                     className="px-8 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center shadow-md disabled:opacity-50"
+                     className="px-8 py-2.5 bg-[#1b438d] text-white rounded-lg font-medium hover:bg-[#163673] transition-colors flex items-center shadow-md disabled:opacity-50"
                   >
                      {step === 2 && resolutions.length === 0 ? 'Define Resolutions First' : 'Next'} 
                      <ChevronRight className="w-5 h-5 ml-1" />

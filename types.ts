@@ -1,17 +1,34 @@
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+
+export enum UserType {
+  MT = 'MT', // Management Tool (Professional)
+  MU = 'MU', // My Unit (Company)
 }
 
+/**
+ * Roles for system access control.
+ */
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  USER = 'USER'
+}
+
+/**
+ * Represents a user within the workspace.
+ */
 export interface User {
   id: string;
   email: string;
   name: string;
   password?: string;
+  userType: UserType;
   role: UserRole;
   isActive: boolean;
   canCreateTemplate: boolean;
-  createdAt: string;
+}
+
+export interface DirectorInfo {
+  name: string;
+  din: string;
 }
 
 export interface ClientProfile {
@@ -20,25 +37,24 @@ export interface ClientProfile {
   companyName: string;
   address: string;
   companyEmail: string;
+  directors: DirectorInfo[]; 
   updatedAt: string;
 }
 
 export enum MeetingType {
   BOARD = 'Board Meeting',
-  COMMITTEE = 'Committee Meeting',
+  EGM = 'Extraordinary General Meeting',
+  AGM = 'Annual General Meeting',
 }
 
 export enum ResolutionType {
-  // Auditor Types
-  APPOINTMENT_FIRST_AUDITOR = 'APPOINTMENT_FIRST_AUDITOR',
-  RESIGNATION_AUDITOR = 'RESIGNATION_AUDITOR',
-  APPOINTMENT_CASUAL_VACANCY = 'APPOINTMENT_CASUAL_VACANCY',
-  APPOINTMENT_SUBSEQUENT_AUDITOR = 'APPOINTMENT_SUBSEQUENT_AUDITOR',
-  // Custom User Template
-  CUSTOM = 'CUSTOM_TEMPLATE',
-  // Personalized Resolution
-  PERSONALIZED = 'PERSONALIZED_RESOLUTION',
+  CUSTOM = 'CUSTOM',
+  PERSONALIZED = 'PERSONALIZED',
+  AI_GENERATED = 'AI_GENERATED'
 }
+
+export type DocCategory = 'RESOLUTION' | 'NOC' | 'INCORPORATION' | 'RESIGNATION' | 'DIR2';
+export type DocSubType = 'SPECIMEN_SIGNATURE' | 'INC_NOC' | 'GENERAL';
 
 export interface CompanyDetails {
   cin: string;
@@ -56,26 +72,16 @@ export interface CompanyDetails {
   quorumPresent: boolean; 
 }
 
-// Data for a single resolution item within a meeting
 export interface ResolutionItemData {
   id: string;
-  type: ResolutionType;
   templateId?: string;
   templateName: string;
-  customValues: Record<string, string>; // Stores values for fields
-  draftText: string; // The specific text for this resolution
+  customValues: Record<string, string>;
+  draftText: string;
+  type?: ResolutionType;
 }
 
-export interface HeaderFooterConfig {
-  showHeader: boolean;
-  headerTitle?: string; // e.g. Company Name override
-  headerSubtitle?: string; // e.g. Regd Office
-  signatoryName: string;
-  signatoryDesignation: string;
-  signatoryDin?: string;
-}
-
-export type CustomFieldType = 'text' | 'number' | 'date' | 'currency' | 'textarea';
+export type CustomFieldType = 'text' | 'number' | 'date' | 'textarea' | 'currency';
 
 export interface CustomField {
   id: string;
@@ -85,17 +91,6 @@ export interface CustomField {
   value?: string;
 }
 
-export interface UserTemplate {
-  id: string;
-  userId: string;
-  name: string;
-  fields: CustomField[];
-  draftText: string;
-  createdAt: string;
-  isSystemTemplate: boolean; // True if created by Admin for global use
-  isActive: boolean;
-}
-
 export interface PersonalizedResolutionItem {
   id: string;
   title: string;
@@ -103,14 +98,38 @@ export interface PersonalizedResolutionItem {
   fields: CustomField[];
 }
 
+export interface HeaderFooterConfig {
+  showHeader: boolean;
+  headerTitle: string;
+  headerSubtitle: string;
+  signatoryName: string;
+  signatoryDesignation: string;
+  signatoryDin: string;
+}
+
 export interface ResolutionData {
   id: string;
   userId: string;
+  clientId?: string;
   createdAt: string;
   companyDetails: CompanyDetails;
-  items?: ResolutionItemData[]; // Multiple resolutions - Optional
-  personalizedData?: PersonalizedResolutionItem[]; // For personalized resolutions
-  headerFooter?: HeaderFooterConfig; // Optional
+  items: ResolutionItemData[];
   finalContent: string; 
+  docType: DocCategory;
+  subType?: DocSubType;
   type: ResolutionType;
+  personalizedData?: PersonalizedResolutionItem[];
+  headerFooter?: HeaderFooterConfig;
+}
+
+export interface UserTemplate {
+  id: string;
+  userId: string;
+  name: string;
+  category: DocCategory;
+  fields: CustomField[];
+  draftText: string;
+  createdAt: string;
+  isSystemTemplate: boolean;
+  isActive: boolean;
 }

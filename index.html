@@ -1,11 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BRsMadeEasy | Board Resolution Automation</title>
+    <title>Client Portal | Patron Accounting</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
@@ -15,58 +16,48 @@
             },
             colors: {
               brand: {
-                50: '#f0fdf4', /* Mint/White-ish tint */
-                100: '#dcfce7',
-                500: '#f97316', /* Saffron/Orange Accent for Buttons/Highlights */
-                600: '#ea580c', /* Darker Orange */
-                700: '#1d4ed8', /* Official Blue Primary */
-                800: '#1e40af', /* Darker Blue */
-                900: '#1e3a8a', /* Deep Navy (MCA Header style) */
+                50: '#f0f4f9',
+                100: '#dbeafe',
+                500: '#f05a28', /* Patron Saffron */
+                600: '#d94d1f',
+                700: '#1b438d', /* Patron Blue */
+                800: '#163673',
+                900: '#0f2754',
               }
+            },
+            boxShadow: {
+              'patron': '0 4px 20px -2px rgba(27, 67, 141, 0.12)',
             }
           }
         }
       }
     </script>
     <style>
-      /* Print specific styles for PDF generation simulation */
-      @media print {
-        body * {
-          visibility: hidden;
-        }
-        #print-section, #print-section * {
-          visibility: visible;
-        }
-        #print-section {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-        }
-      }
+      body { background-color: #f8fafc; }
+      .patron-gradient { background: linear-gradient(135deg, #1b438d 0%, #163673 100%); }
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      .res-preview { font-family: 'Times New Roman', Times, serif; }
+      @media print { .no-print { display: none !important; } }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.3.1",
-    "react/": "https://esm.sh/react@18.3.1/",
-    "react-dom": "https://esm.sh/react-dom@18.3.1",
-    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
-    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-    "@google/genai": "https://esm.sh/@google/genai@0.1.0",
-    "lucide-react": "https://esm.sh/lucide-react@0.263.1",
-    "jspdf": "https://esm.sh/jspdf@2.5.1"
-  }
-}
-</script>
-</head>
-  <body class="bg-slate-50 text-slate-900 antialiased">
-    <div id="root" class="min-h-screen flex flex-col items-center justify-center text-slate-400">
-      <div class="animate-pulse flex flex-col items-center">
-        <div class="h-12 w-12 bg-slate-200 rounded-lg mb-4"></div>
-        <div class="text-sm font-medium">Loading BRsMadeEasy...</div>
-      </div>
-    </div>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.3.1",
+        "react/": "https://esm.sh/react@18.3.1/",
+        "react-dom": "https://esm.sh/react-dom@18.3.1",
+        "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+        "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "@google/genai": "https://esm.sh/@google/genai@0.1.0",
+        "lucide-react": "https://esm.sh/lucide-react@0.263.1",
+        "jspdf": "https://esm.sh/jspdf@2.5.1",
+        "papaparse": "https://esm.sh/papaparse@5.4.1"
+      }
+    }
+    </script>
+  </head>
+  <body class="text-slate-900 antialiased">
+    <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>

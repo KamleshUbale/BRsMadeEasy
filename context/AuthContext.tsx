@@ -1,60 +1,44 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserRole } from '../types';
-import { getCurrentUser, loginUser as serviceLogin, logoutUser as serviceLogout } from '../services/storage';
+
+import React, { createContext, useContext } from 'react';
+import { UserType } from '../types';
 
 interface AuthContextType {
-  user: User | null;
-  login: (email: string, pass: string) => boolean;
-  logout: () => void;
-  isAuthenticated: boolean;
+  mode: UserType;
   isAdmin: boolean;
-  canCreateTemplate: boolean;
+  login: (password: string) => boolean;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Hardcoded for direct access as the tool is for the internal professional team
+  const mode = UserType.MT;
+  const isAdmin = true;
 
-  useEffect(() => {
-    const stored = getCurrentUser();
-    if (stored) setUser(stored);
-    setLoading(false);
-  }, []);
-
-  const login = (email: string, pass: string) => {
-    const foundUser = serviceLogin(email, pass);
-    if (foundUser) {
-      setUser(foundUser);
-      return true;
-    }
-    return false;
+  const login = (password: string): boolean => {
+    return true; // No-op for direct access
   };
 
   const logout = () => {
-    serviceLogout();
-    setUser(null);
+    // No-op for direct access
   };
 
-  if (loading) return null;
-
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout, 
-      isAuthenticated: !!user,
-      isAdmin: user?.role === UserRole.ADMIN,
-      canCreateTemplate: user?.role === UserRole.ADMIN || user?.canCreateTemplate || false
-    }}>
+    <AuthContext.Provider value={{ mode, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+export const useWorkspace = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useWorkspace must be used within WorkspaceProvider');
+  return context;
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
+  if (!context) throw new Error('useAuth must be used within WorkspaceProvider');
+  return { isAdmin: context.isAdmin, login: context.login, logout: context.logout };
 };
